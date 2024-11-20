@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv(".env")
 
-for key, value in os.environ.items():
-    print(f"{key}: {value}")
+# for key, value in os.environ.items():
+    # print(f"{key}: {value}")
 
 def upload_file(file_name, bucket, object_name=None):
     # Verify env file is setup correctly
@@ -23,14 +23,20 @@ def upload_file(file_name, bucket, object_name=None):
     # If S3 object_name was not specified, use file_name
     if object_name is None:
         object_name = os.path.basename(file_name)
+
     # Upload the file
     s3_client = boto3.client('s3', aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"), aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"), aws_session_token=os.getenv("AWS_SESSION_TOKEN"))
+
     try:
         response = s3_client.upload_file(file_name, bucket, object_name)
         print(response)
     except ClientError as e:
         logging.error(e)
         return False
+
     return True
-upload_file('numbers.txt', "a0-unsortednumbers" , 'numbers.txt')
+
+bucket_name = os.getenv("BUCKET_NAME")
+file_path = os.getenv("FILE_PATH")
+upload_file(file_path, bucket_name, 'resume.txt')
 
