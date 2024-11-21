@@ -7,12 +7,10 @@ from dotenv import load_dotenv
 load_dotenv(".env")
 
 # for key, value in os.environ.items():
-    # print(f"{key}: {value}")
+# print(f"{key}: {value}")
 
-def upload_file(file_name, bucket, object_name=None):
-    # Verify env file is setup correctly
-    print("AWS Access Key:", os.getenv("AWS_ACCESS_KEY_ID"))
 
+def upload_file(resume_file_name, job_desc_file_name, bucket, name):
     """Upload a file to an S3 bucket
 
     :param file_name: File to upload
@@ -21,14 +19,23 @@ def upload_file(file_name, bucket, object_name=None):
     :return: True if file was uploaded, else False
     """
     # If S3 object_name was not specified, use file_name
-    if object_name is None:
-        object_name = os.path.basename(file_name)
+    # if object_name is None:
+    # object_name = os.path.basename(file_name)
 
     # Upload the file
-    s3_client = boto3.client('s3', aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"), aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"), aws_session_token=os.getenv("AWS_SESSION_TOKEN"))
+    s3_client = boto3.client(
+        "s3",
+        aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+        aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+        aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+    )
 
     try:
-        response = s3_client.upload_file(file_name, bucket, object_name)
+        response = s3_client.upload_file(
+            job_desc_file_name, bucket, name + "_job_desc.txt"
+        )
+        print(response)
+        response = s3_client.upload_file(resume_file_name, bucket, name + "_resume.txt")
         print(response)
     except ClientError as e:
         logging.error(e)
@@ -36,7 +43,11 @@ def upload_file(file_name, bucket, object_name=None):
 
     return True
 
-bucket_name = os.getenv("BUCKET_NAME")
-file_path = os.getenv("FILE_PATH")
-upload_file(file_path, bucket_name, 'resume.txt')
 
+if __name__ == "main":
+    bucket_name = os.getenv("BUCKET_NAME")
+    # file_path = os.getenv("FILE_PATH")
+    resume_file_name = "resume.txt"
+    job_desc_file_name = "job_desc.txt"
+    name = input("Enter first name") + "_" + input("Enter last name")
+    upload_file(resume_file_name, job_desc_file_name, bucket_name, name)
