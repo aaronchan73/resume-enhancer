@@ -23,18 +23,21 @@ def load_data(bucket_name, file_name):
     return data.decode("utf-8")
 
 
-@app.route("/enhance/<bucket>/<file>", methods=["GET"])
-def enhance_resume(bucket, file):
-    print("Bucket:", bucket, "File:", file)
+@app.route("/enhance/<bucket>/<id>", methods=["GET"])
+def enhance_resume(bucket, id):
+    print("Bucket:", bucket, "ID:", id)
 
-    # TODO: Need to retrive job description from S3 as well. Have to decide on format of uploaded files.
-    job_desc = ""
-    resume = load_data(bucket, file)
+    resume = load_data(bucket, id + "_resume.txt")
+    job_desc = load_data(bucket, id + "_job_desc.txt")
     print("Resume:", resume)
+    print("Job description:", job_desc)
 
     ollama_body = {
         "model": "llama3.2:1b",
-        "prompt": "Given the following resume, enhance it: " + resume,
+        "prompt": "Given the following resume and job description, enhance the resume to match the job description: "
+        + resume
+        + "\n\n"
+        + job_desc,
         "stream": False,
     }
     print("Ollama body:", ollama_body)
