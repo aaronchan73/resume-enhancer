@@ -2,40 +2,43 @@ import json
 from collections import Counter
 import boto3
 
+
 def lambda_handler(event, context):
-    def word_count(paragraph):
-        # Remove punctuation from input paragraph and convert to lowercase
-        paragraph = paragraph.lower().replace('.', '').replace(',', '')
+    try:
+        s3 = boto3.client("s3")
 
-        # Split the paragraph into a list of words
-        words = paragraph.split()
+        # Get bucket name and file key from the S3 event
+        print(event)
+        bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
+        file_key = event["Records"][0]["s3"]["object"]["key"]
 
-        # Count the number of occurrences of each word
-        word_count = Counter(words)
+        # Get the file object from S3
+        file_obj = s3.get_object(Bucket=bucket_name, Key=file_key)
 
-        # Sort the words in descending order of frequency
-        sorted_word_count = dict(sorted(word_count.items(), key=lambda item: item[1], reverse=True))
-        print (sorted_word_count)
-        return sorted_word_count
+        # Read the content of the file
+        file_content = file_obj["Body"].read().decode("utf-8")
 
-    s3 = boto3.client('s3')
+        print(f"Content of the file {file_key} from bucket {bucket_name}:")
 
-    # Get bucket name and file key from the S3 event
-    print(event)
-    bucket_name = event['Records'][0]['s3']['bucket']['name']
-    file_key = event['Records'][0]['s3']['object']['key']
+        resume_id = ""
+        input_resume = ""
+        input_job_desc = ""
 
-    # Get the file object from S3
-    file_obj = s3.get_object(Bucket=bucket_name, Key=file_key)
+        # TODO: Call REST API on the ec2 server and get the returned enhanced resume
 
-    # Read the content of the file
-    file_content = file_obj['Body'].read().decode('utf-8')
+        enhanced_resume = ""
 
-    print(f'Content of the file {file_key} from bucket {bucket_name}:')
+        resume_table = boto3.resource("dynamodb", region_name="ca-central-1").Table(
+            "enhanced_resumes"
+        )
+        data = {
+            "resume_id": resume_id,
+            "input_resume": input_resume,
+            "input_job_desc": input_job_desc,
+            "enhanced_resume": enhanced_resume,
+        }
+    except Exception as e:
+        print(f"Exception: {e}")
+        return {"statusCode": 500, "body": json.dumps({"message ": str(e)})}
 
-    sorted_word_count = word_count(file_content)
-
-    return {
-        "statusCode": 200,
-        "body": str(sorted_word_count)
-    }
+    return {"statusCode": 200, "body": str(sorted_word_count)}
