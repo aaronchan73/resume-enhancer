@@ -14,9 +14,6 @@ POLL_INTERVAL = 5  # Seconds between polls
 
 bucket_name = os.getenv("BUCKET_NAME")
 
-# for key, value in os.environ.items():
-# print(f"{key}: {value}")
-
 dynamodb = boto3.resource(
     "dynamodb",
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),

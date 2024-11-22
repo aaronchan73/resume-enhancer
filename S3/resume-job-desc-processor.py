@@ -1,18 +1,16 @@
 import json
 from collections import Counter
 import boto3
-import requests
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
+import urllib.request
 
 EC2_URL = os.getenv("EC2_URL")
 
-def lambda_handler(event, context):
-    def parse_uuid(file_key):
-        return file_key.split("_")[0]
+def parse_uuid(file_key):
+    return file_key.split("_")[0]
 
+
+def lambda_handler(event, context):
     try:
         s3 = boto3.client("s3")
 
@@ -22,30 +20,34 @@ def lambda_handler(event, context):
         file_key = event["Records"][0]["s3"]["object"]["key"]
 
         # Get the file object from S3
-        file_obj = s3.get_object(Bucket=bucket_name, Key=file_key)
+        resume_obj = s3.get_object(Bucket=bucket_name, Key=file_key)
 
-        # Read the content of the file
-        file_content = file_obj["Body"].read().decode("utf-8")
-
-        print(f"Content of the file {file_key} from bucket {bucket_name}:")
+        # Read the content of the resume file
+        resume = resume_obj["Body"].read().decode("utf-8")
+        print(f"Content of the file {file_key} from bucket {bucket_name}:", resume)
 
         resume_id = parse_uuid(file_key)
-        input_resume = ""
-        input_job_desc = ""
+        print("Resume ID:", resume_id)
 
-        enhanced_resume = ""
-        ec2_endpoint = EC2_URL + "/enhance/" + bucket_name + "/" + resume_id
+        # Read the content of the job description file  
+        job_desc_obj = s3.get_object(Bucket=bucket_name, Key=file_key.replace("_resume", "_job_desc"))
+        job_desc = job_desc_obj["Body"].read().decode("utf-8")
+        print(f"Content of the file {file_key.replace('_resume', '_job_desc')} from bucket {bucket_name}:", job_desc)
+        
+        # Send the resume and job description to the EC2 instance to enhance the resume
+        ec2_endpoint = "http://" + EC2_URL + "/enhance/" + bucket_name + "/" + resume_id
 
-        response = requests.get(ec2_endpoint)
-        enhanced_resume = response.json()["body"]
+        enhanced_resume = urllib.request.urlopen(ec2_endpoint).read()
+        print("Enhanced Resume:", enhanced_resume)
 
+        # Save the enhanced resume to the DynamoDB table
         resume_table = boto3.resource("dynamodb", region_name="ca-central-1").Table(
             "enhanced_resumes"
         )
         data = {
             "resume_id": resume_id,
-            "input_resume": input_resume,
-            "input_job_desc": input_job_desc,
+            "input_resume": resume,
+            "input_job_desc": job_desc,
             "enhanced_resume": enhanced_resume,
         }
         resume_table.put_item(Item=data)
