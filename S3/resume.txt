@@ -1,1 +1,42 @@
-This is my sample resume
+John Doe
+johndoe@email.com /linkedin.com/in/johndoe | github.com/johndoe
+
+Education
+University of British Columbia, Canada - BS in Computer Science
+December 2023
+
+Skills
+Languages: Java, TypeScript, PHP, SQL, C, C+ +, HTML, CSS
+Technologies/Frameworks: Spring Framework, Spring Boot, Angular, Laravel, JUnit, Hibernate, MySQL, Sybase,
+PostgreSQL
+Developer Tools: Git, Postman, Jira, Docker, Control-M
+
+Experience
+Software Developer, RBC - Canada
+Dec 2023 - Present
+﻿﻿Enhanced functionality in banking application's C+ + and Java codebases by implementing new features and refactoring legacy components, leading to a 20% improvement in system efficiency
+﻿﻿Developed Batch applications using Java and C+ + to perform actions on Sybase database tables based on records within files processed, contributed from development environments to production
+﻿﻿Wrote effective SQL queries for Sybase database by analyzing and extracting the columns needed reducing execute time by 30% to generate files with large data records
+﻿﻿Created FileWatcher Bash scripts to automate batch application execution upon file arrival at specific directories, leading to an increase in operational efficiency
+﻿﻿Collaborated with cross-functional teams and engineers, answering technical issues about the codebase, database, and design requirements to manage effective development, resulting in increased customer satisfaction
+
+Software Development Intern, IBM - Canada
+Jan 2023 - Aug 2023
+﻿﻿Developed a mobile application using React Native with TypeScript, focused on tree records management processes and significantly reducing time spent by 80% compared to traditional paper-based methods
+﻿﻿Implemented a SQLite database into the mobile app to provide offline usage by enabling effective local data storage, included a server backup system to deliver data and provide integrity when online
+﻿﻿Designed and developed a back-end RESTful API using Java with Spring Boot and MySQL database to store records, ensured code quality by unit testing with JUnit
+﻿﻿Created MySQL database tables and relationships based on requirements, tested data consistency and accuracy by using over 10,000 existing data tree records from an excel file
+
+Projects
+
+Fullstack Customer Management Application
+﻿﻿Developed a full-stack web application deployed on AWS Amplify, allowing users to authenticate and request services while admin users manage these requests, ensuring user authorization for certain tasks
+﻿﻿Integrated security measures for user accounts by implementing multifactor authentication using Email and Twilio services, and keeping detailed account activity logs to ensure traceability
+﻿﻿Created the front-end with Angular and TypeScript, ensuring seamless interaction with the back-end for quick data exchange, resulting in a responsive application interface
+﻿﻿Managed exception handling by effectively addressing errors on both the front-end and back-end, ensuring quality control and seamless user experience
+
+Backend Development for NGO
+﻿﻿Designed and implemented a REST API using Java and Spring Boot to streamline the management of activities, comments, posts, and user interactions on the NGO website
+﻿﻿Secured endpoints by implementing user authentication using JWT, ensured distinct authorization roles for each user type
+﻿﻿Implemented Clean Architecture principles under the guidance of an experienced software developer, resulting in a high-quality delivery
+
