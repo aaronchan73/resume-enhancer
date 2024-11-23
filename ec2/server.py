@@ -33,7 +33,7 @@ def enhance_resume(bucket, id):
     print("Job description:", job_desc)
 
     ollama_body = {
-        "model": "llama3.2:1b",
+        "model": "tinyllama",
         "prompt": "Given the following resume and job description, enhance the resume to match the job description: "
         + resume
         + "\n\n"
