@@ -33,9 +33,14 @@ def lambda_handler(event, context):
         job_desc_obj = s3.get_object(Bucket=bucket_name, Key=file_key.replace("_resume", "_job_desc"))
         job_desc = job_desc_obj["Body"].read().decode("utf-8")
         print(f"Content of the file {file_key.replace('_resume', '_job_desc')} from bucket {bucket_name}:", job_desc)
-        
+
+        ec2 = boto3.client('ec2')
+        instance_info = ec2.describe_instances(InstanceIds=[os.getenv("INSTANCE_ID")])
+        public_ip = instance_info['Reservations'][0]['Instances'][0]['PublicIpAddress']
+
         # Send the resume and job description to the EC2 instance to enhance the resume
-        ec2_endpoint = "http://" + EC2_URL + "/enhance/" + bucket_name + "/" + resume_id
+        ec2_endpoint = f"http://{public_ip}:5000/enhance/{bucket_name}/{resume_id}"
+        print("Calling", ec2_endpoint, "...")
 
         enhanced_resume = urllib.request.urlopen(ec2_endpoint).read()
         print("Enhanced Resume:", enhanced_resume)
