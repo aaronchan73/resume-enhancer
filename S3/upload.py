@@ -2,16 +2,17 @@ import boto3
 import logging
 import os
 import time
+import uuid
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
 
-load_dotenv(".env")
+load_dotenv()
+
 TABLE_NAME = "enhanced_resumes"
 PARTITION_KEY = "resume_id"
 POLL_INTERVAL = 5  # Seconds between polls
 
-# for key, value in os.environ.items():
-# print(f"{key}: {value}")
+bucket_name = os.getenv("BUCKET_NAME")
 
 dynamodb = boto3.resource(
     "dynamodb",
@@ -37,22 +38,17 @@ def upload_file(resume_file_name, job_desc_file_name, bucket):
     :param object_name: S3 object name. If not specified then file_name is used
     :return: True if file was uploaded, else False
     """
-    # If S3 object_name was not specified, use file_name
-    # if object_name is None:
-    # object_name = os.path.basename(file_name)
-
-    resume_id = 1  # placeholder number that we need to increment
+    # Generate a unique resume_id using UUID
+    resume_id = str(uuid.uuid4())
 
     # Upload the file
     try:
-        response = s3_client.upload_file(
-            job_desc_file_name, bucket, str(resume_id) + "_job_desc.txt"
+        s3_client.upload_file(
+            job_desc_file_name, bucket, f"{resume_id}_job_desc.txt"
         )
-        print(response)
-        response = s3_client.upload_file(
-            resume_file_name, bucket, str(resume_id) + "_resume.txt"
+        s3_client.upload_file(
+            resume_file_name, bucket, f"{resume_id}_resume.txt"
         )
-        print(response)
     except ClientError as e:
         logging.error(e)
         return -1
@@ -63,6 +59,7 @@ def upload_file(resume_file_name, job_desc_file_name, bucket):
 def get_item(key_name, key_value):
     try:
         response = table.get_item(Key={key_name: key_value})
+        print("Item retrieved from DynamoDB:", response)
         return response.get("Item", None)
     except ClientError as e:
         print(f"Error fetching item: {e.response['Error']['Message']}")
@@ -73,7 +70,7 @@ def poll_for_updated_resume(key_name, key_value, interval):
     print(f"Polling DynamoDB table '{TABLE_NAME}' for item with key '{key_value}'...")
 
     while True:
-        item = table.get_item(key_name, key_value)
+        item = get_item(key_name, key_value)
 
         if item:
             print(f"Item found: {item}")
@@ -84,13 +81,17 @@ def poll_for_updated_resume(key_name, key_value, interval):
         time.sleep(interval)
 
 
-if __name__ == "main":
-    bucket_name = os.getenv("BUCKET_NAME")
-    # file_path = os.getenv("FILE_PATH")
+if __name__ == "__main__":
+    print("Bucket name:", bucket_name)
+
     resume_file_name = "resume.txt"
     job_desc_file_name = "job_desc.txt"
+
     resume_id = upload_file(resume_file_name, job_desc_file_name, bucket_name)
+    print("Resume successfully uploaded with id", resume_id)
+
     resume_row = poll_for_updated_resume(PARTITION_KEY, resume_file_name, POLL_INTERVAL)
+    print("Resume row:", resume_row)
     if resume_row and "enhanced_resume" in resume_row:
         with open("enhanced_resume.txt", "w") as file:
             file.write(resume_row["enhanced_resume"])
