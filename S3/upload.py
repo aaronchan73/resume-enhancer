@@ -16,6 +16,7 @@ bucket_name = os.getenv("BUCKET_NAME")
 
 dynamodb = boto3.resource(
     "dynamodb",
+    region_name="ca-central-1",
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
     aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
@@ -43,12 +44,8 @@ def upload_file(resume_file_name, job_desc_file_name, bucket):
 
     # Upload the file
     try:
-        s3_client.upload_file(
-            job_desc_file_name, bucket, f"{resume_id}_job_desc.txt"
-        )
-        s3_client.upload_file(
-            resume_file_name, bucket, f"{resume_id}_resume.txt"
-        )
+        s3_client.upload_file(job_desc_file_name, bucket, f"{resume_id}_job_desc.txt")
+        s3_client.upload_file(resume_file_name, bucket, f"{resume_id}_resume.txt")
     except ClientError as e:
         logging.error(e)
         return -1
