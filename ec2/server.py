@@ -16,6 +16,9 @@ s3 = boto3.client(
     aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
 )
 
+resume_table = boto3.resource("dynamodb", region_name="ca-central-1").Table(
+    "enhanced_resumes"
+)
 
 def load_data(bucket_name, file_name):
     obj = s3.get_object(Bucket=bucket_name, Key=file_name)
@@ -43,9 +46,27 @@ def enhance_resume(bucket, id):
     print("Ollama body:", ollama_body)
 
     result = requests.post(OLLAMA_URL, json=ollama_body)
-    print("Enhanced resume:", result.json())
+    response = result.json()["response"]
+    print("Enhanced resume:", response)
 
-    return result.json()["response"]
+    with open(f"{id}_enhanced_resume.txt", "w") as f:
+        f.write(response)
+    
+    s3.upload_file(f"{id}_enhanced_resume.txt", os.getenv("ENHANCED_RESUMES_BUCKET"), f"{id}_enhanced_resume.txt")
+    enhanced_resume_url = s3.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": os.getenv("ENHANCED_RESUMES_BUCKET"), "Key": f"{id}_enhanced_resume.txt"},
+        ExpiresIn=3600
+    )
+    print("Enhanced resume URL:", enhanced_resume_url)
+
+    resume_table.update_item(
+        Key={"resume_id": id},
+        UpdateExpression="SET enhanced_resume = :url",
+        ExpressionAttributeValues={":url": enhanced_resume_url},
+    )
+
+    return response
 
 
 if __name__ == "__main__":
