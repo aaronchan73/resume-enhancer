@@ -58,26 +58,30 @@ def generate_wordcloud(word_frequencies):
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     plt.title("Top 10 Most Common Keywords in Job Descriptions", fontsize=16)
-    plt.show()
-    plt.savefig("foo.png")
+
+    output_path = "./visualize/wordcloud.png"
+    print(f"Saving word cloud to {output_path}...")
+    plt.savefig(output_path, format="png", dpi=300)
+    plt.close()
+    print("File saved successfully.")
 
 
 if __name__ == "__main__":
     table_name = "TopWordFrequencies"
     id_key = "job_description_words"
-    word_frequencies = {
-        "flask": 2,
-        "python": 400,
-        "django": 50,
-        "react": 30,
-        "nodejs": 20,
-        "sql": 100,
-        "javascript": 80,
-        "typescript": 25,
-        "aws": 60,
-        "docker": 15,
-    }
-    store_word_frequencies(table_name, id_key, word_frequencies)
+    # word_frequencies = {
+    #     "flask": 2,
+    #     "python": 400,
+    #     "django": 50,
+    #     "react": 30,
+    #     "nodejs": 20,
+    #     "sql": 100,
+    #     "javascript": 80,
+    #     "typescript": 25,
+    #     "aws": 60,
+    #     "docker": 15,
+    # }
+    # store_word_frequencies(table_name, id_key, word_frequencies)
 
     word_frequencies = get_word_frequencies(table_name, id_key)
 
