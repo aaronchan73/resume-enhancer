@@ -34,7 +34,7 @@ def enhance_resume(bucket, id):
 
     ollama_body = {
         "model": "tinyllama",
-        "prompt": "Given the following resume and job description, enhance the resume to match the job description: "
+        "prompt": "Given the following resume and job description, edit the existing resume points to better match the job description. Do not change the structure of the resume, simply extract some keywords and technologies that are required in the job description, and then include them where appropriate."
         + resume
         + "\n\n"
         + job_desc,
