@@ -1,5 +1,4 @@
 import json
-from collections import Counter
 import boto3
 import os
 import urllib.request
@@ -45,17 +44,12 @@ def lambda_handler(event, context):
         enhanced_resume = urllib.request.urlopen(ec2_endpoint).read()
         print("Enhanced Resume:", enhanced_resume)
 
-        # Save the enhanced resume to the DynamoDB table
-        resume_table = boto3.resource("dynamodb", region_name="ca-central-1").Table(
-            "enhanced_resumes"
-        )
         data = {
             "resume_id": resume_id,
             "input_resume": resume,
             "input_job_desc": job_desc,
             "enhanced_resume": enhanced_resume,
         }
-        resume_table.put_item(Item=data)
        
     except Exception as e:
         print(f"Exception: {e}")
