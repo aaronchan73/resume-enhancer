@@ -61,9 +61,9 @@ def enhance_resume(bucket, id):
     print("Enhanced resume URL:", enhanced_resume_url)
 
     resume_table.update_item(
-        Key={"resume_id": id},
+        Key={"resume_id": str(id)},
         UpdateExpression="SET enhanced_resume = :url",
-        ExpressionAttributeValues={":url": enhanced_resume_url},
+        ExpressionAttributeValues={":url": str(enhanced_resume_url)},
     )
 
     return response

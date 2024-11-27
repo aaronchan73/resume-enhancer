@@ -10,7 +10,7 @@ load_dotenv()
 
 TABLE_NAME = "enhanced_resumes"
 PARTITION_KEY = "resume_id"
-POLL_INTERVAL = 5  # Seconds between polls
+POLL_INTERVAL = 30  # Seconds between polls
 
 bucket_name = os.getenv("BUCKET_NAME")
 
@@ -74,7 +74,9 @@ def poll_for_updated_resume(key_name, key_value, interval):
 
         if item:
             print(f"Item found: {item}")
-            return "Item" in item
+            resume = item["enhanced_resume"]
+            url = resume.split("?")[0]
+            return url
         else:
             print("Item not found. Retrying...")
 
@@ -90,11 +92,11 @@ if __name__ == "__main__":
     resume_id = upload_file(resume_file_name, job_desc_file_name, bucket_name)
     print("Resume successfully uploaded with id", resume_id)
 
-    resume_row = poll_for_updated_resume(PARTITION_KEY, resume_file_name, POLL_INTERVAL)
-    print("Resume row:", resume_row)
-    if resume_row and "enhanced_resume" in resume_row:
-        with open("enhanced_resume.txt", "w") as file:
-            file.write(resume_row["enhanced_resume"])
-        print("Enhanced resume saved to enhanced_resume.txt")
+    url = poll_for_updated_resume("resume_id", resume_id, POLL_INTERVAL)
+    print("Enhanced resume URL:", url)
+    if url:
+        with open(f"{resume_id}_enhanced_resume.txt", "w") as file:
+            file.write(url)
+        print(f"Enhanced resume saved to {resume_id}_enhanced_resume.txt")
     else:
         print("Enhanced resume not found in the database.")
