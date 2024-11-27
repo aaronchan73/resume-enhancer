@@ -8,8 +8,9 @@ dynamodb = boto3.resource(
     aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
     aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
     aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
-    region_name='ca-central-1'
+    region_name="ca-central-1",
 )
+
 
 def store_word_frequencies(table_name, id_key, word_frequencies):
     """
@@ -23,20 +24,19 @@ def store_word_frequencies(table_name, id_key, word_frequencies):
     table = dynamodb.Table(table_name)
 
     # Store the dictionary in DynamoDB as a Map
-    table.put_item(
-        Item={
-            'id': id_key,
-            'word_frequencies': word_frequencies
-        }
-    )
+    table.put_item(Item={"id": id_key, "word_frequencies": word_frequencies})
     print(f"Stored word frequencies under id '{id_key}' in table '{table_name}'.")
+
 
 def get_word_frequencies(table_name, id_key):
     table = dynamodb.Table(table_name)
-    response = table.get_item(Key={'id': id_key})
-    if 'Item' in response:
-        return response['Item'].get('word_frequencies', {})
+    response = table.get_item(Key={"id": id_key})
+    if "Item" in response:
+        for key, value in response["Item"]["word_frequencies"].items():
+            response["Item"]["word_frequencies"][key] = int(value)
+        return response["Item"].get("word_frequencies", {})
     return None
+
 
 def generate_wordcloud(word_frequencies):
     """
@@ -46,7 +46,9 @@ def generate_wordcloud(word_frequencies):
         word_frequencies (dict): Dictionary with words as keys and frequencies as values.
     """
     # Create a WordCloud object
-    wordcloud = WordCloud(width=800, height=400, background_color="white", colormap="viridis")
+    wordcloud = WordCloud(
+        width=800, height=400, background_color="white", colormap="viridis"
+    )
 
     # Generate the word cloud using the input frequencies
     wordcloud.generate_from_frequencies(word_frequencies)
@@ -57,6 +59,8 @@ def generate_wordcloud(word_frequencies):
     plt.axis("off")
     plt.title("Top 10 Most Common Keywords in Job Descriptions", fontsize=16)
     plt.show()
+    plt.savefig("foo.png")
+
 
 if __name__ == "__main__":
     table_name = "TopWordFrequencies"
