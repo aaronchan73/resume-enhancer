@@ -6,18 +6,95 @@ import os
 
 # Define the set of acceptable keywords
 keywords = {
-"python", "developer", "api", "react", "javascript", "database", "backend",
-"frontend", "fullstack", "testing", "node", "express", "html", "css", "typescript",
-"cloud", "aws", "azure", "gcp", "docker", "kubernetes", "linux", "git", "version control",
-"microservices", "devops", "sql", "nosql", "graphql", "web", "ui", "ux", "agile",
-"scrum", "ci/cd", "automation", "machine learning", "artificial intelligence",
-"data science", "data analysis", "cybersecurity", "api development", "software engineering",
-"architecture", "scalability", "performance", "optimization", "architecture", "system design",
-"java", "c#", "ruby", "php", "golang", "swift", "objective-c", "android", "ios", "mobile",
-"flutter", "flutter", "react-native", "flutter", "testing frameworks", "unit testing", "integration testing",
-"tdd", "bdd", "docker", "kubernetes", "virtualization", "cloud-native", "CI", "CD", "rest",
-"web services", "big data", "etl", "spark", "hadoop", "data pipelines", "data wrangling", "api testing",
-"security", "encryption", "oauth", "jwt", "authentication", "authorization"
+    "python",
+    "developer",
+    "api",
+    "react",
+    "javascript",
+    "database",
+    "backend",
+    "frontend",
+    "fullstack",
+    "testing",
+    "node",
+    "express",
+    "html",
+    "css",
+    "typescript",
+    "cloud",
+    "aws",
+    "azure",
+    "gcp",
+    "docker",
+    "kubernetes",
+    "linux",
+    "git",
+    "version control",
+    "microservices",
+    "devops",
+    "sql",
+    "nosql",
+    "graphql",
+    "web",
+    "ui",
+    "ux",
+    "agile",
+    "scrum",
+    "ci/cd",
+    "automation",
+    "machine learning",
+    "artificial intelligence",
+    "data science",
+    "data analysis",
+    "cybersecurity",
+    "api development",
+    "software engineering",
+    "architecture",
+    "scalability",
+    "performance",
+    "optimization",
+    "architecture",
+    "system design",
+    "java",
+    "c#",
+    "ruby",
+    "php",
+    "golang",
+    "swift",
+    "objective-c",
+    "android",
+    "ios",
+    "mobile",
+    "flutter",
+    "flutter",
+    "react-native",
+    "flutter",
+    "testing frameworks",
+    "unit testing",
+    "integration testing",
+    "tdd",
+    "bdd",
+    "docker",
+    "kubernetes",
+    "virtualization",
+    "cloud-native",
+    "CI",
+    "CD",
+    "rest",
+    "web services",
+    "big data",
+    "etl",
+    "spark",
+    "hadoop",
+    "data pipelines",
+    "data wrangling",
+    "api testing",
+    "security",
+    "encryption",
+    "oauth",
+    "jwt",
+    "authentication",
+    "authorization",
 }
 
 dynamodb = boto3.resource(
@@ -27,6 +104,7 @@ dynamodb = boto3.resource(
     aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
     region_name="ca-central-1",
 )
+
 
 def extract_matching_keywords(file_path, keywords):
     """
@@ -38,12 +116,12 @@ def extract_matching_keywords(file_path, keywords):
     """
     try:
         # Open and read the file
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             text_content = file.read()
 
         # Tokenize the text into words (case insensitive, remove punctuation)
         words = text_content.lower().split()
-        cleaned_words = [word.strip('.,!?()[]{}:;\'"') for word in words]
+        cleaned_words = [word.strip(".,!?()[]{}:;'\"") for word in words]
 
         # Find matches
         matching_keywords = [word for word in cleaned_words if word in keywords]
@@ -60,7 +138,8 @@ def extract_matching_keywords(file_path, keywords):
         print(f"An error occurred: {e}")
         return {}
 
-def get_top_n_keywords(n):
+
+def get_top_n_keywords(n, word_frequencies):
     """
     Extract the top N most frequent keywords from the word_frequencies dictionary.
 
@@ -68,9 +147,12 @@ def get_top_n_keywords(n):
     :return: A dictionary containing the top N keywords and their counts.
     """
     # Sort the word_frequencies dictionary by value in descending order and select the top N items
-    sorted_keywords = dict(sorted(word_frequencies.items(), key=lambda item: item[1], reverse=True)[:n])
+    sorted_keywords = dict(
+        sorted(word_frequencies.items(), key=lambda item: item[1], reverse=True)[:n]
+    )
 
     return sorted_keywords
+
 
 def store_word_frequencies(table_name, id_key, word_frequencies):
     """
@@ -125,31 +207,105 @@ def generate_wordcloud(word_frequencies):
     plt.close()
     print("File saved successfully.")
 
-def reset_table():
+
+def reset_table(table_name, id_key):
     word_frequencies = {
-      "python": 0, "developer": 0, "api": 0, "react": 0, "javascript": 0, "database": 0, "backend": 0,
-      "frontend": 0, "fullstack": 0, "testing": 0, "node": 0, "express": 0, "html": 0, "css": 0, "typescript": 0,
-      "cloud": 0, "aws": 0, "azure": 0, "gcp": 0, "docker": 0, "kubernetes": 0, "linux": 0, "git": 0, "version control": 0,
-      "microservices": 0, "devops": 0, "sql": 0, "nosql": 0, "graphql": 0, "web": 0, "ui": 0, "ux": 0, "agile": 0,
-      "scrum": 0, "ci/cd": 0, "automation": 0, "machine learning": 0, "artificial intelligence": 0,
-      "data science": 0, "data analysis": 0, "cybersecurity": 0, "api development": 0, "software engineering": 0,
-      "architecture": 0, "scalability": 0, "performance": 0, "optimization": 0, "system design": 0,
-      "java": 0, "c#": 0, "ruby": 0, "php": 0, "golang": 0, "swift": 0, "objective-c": 0, "android": 0, "ios": 0, "mobile": 0,
-      "flutter": 0, "react-native": 0, "testing frameworks": 0, "unit testing": 0, "integration testing": 0,
-      "tdd": 0, "bdd": 0, "virtualization": 0, "cloud-native": 0, "CI": 0, "CD": 0, "rest": 0,
-      "web services": 0, "big data": 0, "etl": 0, "spark": 0, "hadoop": 0, "data pipelines": 0, "data wrangling": 0, "api testing": 0,
-      "security": 0, "encryption": 0, "oauth": 0, "jwt": 0, "authentication": 0, "authorization": 0
+        "python": 0,
+        "developer": 0,
+        "api": 0,
+        "react": 0,
+        "javascript": 0,
+        "database": 0,
+        "backend": 0,
+        "frontend": 0,
+        "fullstack": 0,
+        "testing": 0,
+        "node": 0,
+        "express": 0,
+        "html": 0,
+        "css": 0,
+        "typescript": 0,
+        "cloud": 0,
+        "aws": 0,
+        "azure": 0,
+        "gcp": 0,
+        "docker": 0,
+        "kubernetes": 0,
+        "linux": 0,
+        "git": 0,
+        "version control": 0,
+        "microservices": 0,
+        "devops": 0,
+        "sql": 0,
+        "nosql": 0,
+        "graphql": 0,
+        "web": 0,
+        "ui": 0,
+        "ux": 0,
+        "agile": 0,
+        "scrum": 0,
+        "ci/cd": 0,
+        "automation": 0,
+        "machine learning": 0,
+        "artificial intelligence": 0,
+        "data science": 0,
+        "data analysis": 0,
+        "cybersecurity": 0,
+        "api development": 0,
+        "software engineering": 0,
+        "architecture": 0,
+        "scalability": 0,
+        "performance": 0,
+        "optimization": 0,
+        "system design": 0,
+        "java": 0,
+        "c#": 0,
+        "ruby": 0,
+        "php": 0,
+        "golang": 0,
+        "swift": 0,
+        "objective-c": 0,
+        "android": 0,
+        "ios": 0,
+        "mobile": 0,
+        "flutter": 0,
+        "react-native": 0,
+        "testing frameworks": 0,
+        "unit testing": 0,
+        "integration testing": 0,
+        "tdd": 0,
+        "bdd": 0,
+        "virtualization": 0,
+        "cloud-native": 0,
+        "CI": 0,
+        "CD": 0,
+        "rest": 0,
+        "web services": 0,
+        "big data": 0,
+        "etl": 0,
+        "spark": 0,
+        "hadoop": 0,
+        "data pipelines": 0,
+        "data wrangling": 0,
+        "api testing": 0,
+        "security": 0,
+        "encryption": 0,
+        "oauth": 0,
+        "jwt": 0,
+        "authentication": 0,
+        "authorization": 0,
     }
 
     store_word_frequencies(table_name, id_key, word_frequencies)
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
+def run_visualize():
     table_name = "TopWordFrequencies"
     id_key = "job_description_words"
 
     # Resets the table to have 0 counts for all keywords
-    # reset_table()
+    # reset_table(table_name, id_key)
 
     # Define the path to your .txt file
     file_path = "S3/job_desc.txt"
@@ -176,7 +332,7 @@ if __name__ == "__main__":
     store_word_frequencies(table_name, id_key, word_frequencies)
 
     # Extract and print the top 10 most frequent keywords
-    top_10_keywords = get_top_n_keywords(10)
+    top_10_keywords = get_top_n_keywords(10, word_frequencies)
     print("Top 10 most frequent keywords:")
     print(top_10_keywords)
 

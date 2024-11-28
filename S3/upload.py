@@ -1,10 +1,12 @@
 import boto3
 import logging
 import os
+import sys
 import time
 import uuid
 from botocore.exceptions import ClientError
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
@@ -97,3 +99,8 @@ if __name__ == "__main__":
         print(f"Enhanced resume saved to {resume_id}_enhanced_resume.txt")
     else:
         print("Enhanced resume not found in the database.")
+
+    sys.path.append(os.path.join(os.path.dirname(__file__), "..", "visualize"))
+    from visualize import run_visualize
+
+    run_visualize()
